@@ -1,31 +1,46 @@
 <?php
 session_start();
-$host='localhost'; $user='portaluser'; $pass='StrongPassword'; $db='student_portal';
-$conn = new mysqli($host,$user,$pass,$db);
 
-if($conn->connect_error) die("DB Connection failed: ".$conn->connect_error);
+// Database connection
+$host = 'localhost';
+$user = 'portaluser';
+$pass = 'StrongPassword';
+$db   = 'student_portal';
+$conn = new mysqli($host, $user, $pass, $db);
 
-// Random background from folder
+if ($conn->connect_error) {
+    die("DB Connection failed: " . $conn->connect_error);
+}
+
+// Random background
 $bg_folder = 'assets/bg/';
 $bg_images = glob($bg_folder . '*.{jpg,jpeg,png,gif}', GLOB_BRACE);
 $bg_url = $bg_images[array_rand($bg_images)] ?? '';
 
-if($_SERVER['REQUEST_METHOD']=='POST'){
+$error = '';
+
+// Handle POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $stmt = $conn->prepare("SELECT id,password_hash FROM users WHERE username=?");
-    $stmt->bind_param("s",$username);
+
+    $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username=?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $res = $stmt->get_result();
-    if($res->num_rows){
+
+    if ($res->num_rows) {
         $row = $res->fetch_assoc();
-        if(password_verify($password,$row['password_hash'])){
+        if (password_verify($password, $row['password_hash'])) {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['username'] = $username;
+
+            // Redirect before any output
             header("Location: index.php");
             exit;
         }
     }
+
     $error = "Invalid username or password";
 }
 ?>
@@ -71,7 +86,7 @@ a:hover {text-decoration:underline;}
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <button type="submit">Login</button>
-    <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
+    <?php if($error) echo "<p class='error'>$error</p>"; ?>
     <a href="register.php">Don't have an account? Register</a>
 </form>
 </body>
