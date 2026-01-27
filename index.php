@@ -83,11 +83,26 @@ button:hover { background: #357ab8; }
 <body>
 
 <header>
-<h1>Student Voice Portal</h1>
+<h1 id="portal-title">Student Voice Portal - DAV BINA</h1>
 <form method="POST" action="logout.php">
     <button>Logout</button>
 </form>
 </header>
+
+<script>
+// Random color animation for header text
+function randomColor() {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    return `rgb(${r},${g},${b})`;
+}
+
+const title = document.getElementById('portal-title');
+setInterval(() => {
+    title.style.color = randomColor();
+}, 500); // change color every 0.5s
+</script>
 
 <section>
 <h2>Submit Feedback</h2>
