@@ -1,36 +1,52 @@
 <?php
 session_start();
-$host='localhost'; $user='portaluser'; $pass='StrongPassword'; $db='student_portal';
-$conn = new mysqli($host,$user,$pass,$db);
 
-if($conn->connect_error) die("DB Connection failed: ".$conn->connect_error);
+// Database connection
+$host = 'localhost';
+$user = 'portaluser';
+$pass = 'StrongPassword';
+$db   = 'student_portal';
+$conn = new mysqli($host, $user, $pass, $db);
 
-// Random background from folder
+if ($conn->connect_error) {
+    die("DB Connection failed: " . $conn->connect_error);
+}
+
+// Random background
 $bg_folder = 'assets/bg/';
 $bg_images = glob($bg_folder . '*.{jpg,jpeg,png,gif}', GLOB_BRACE);
 $bg_url = $bg_images[array_rand($bg_images)] ?? '';
 
-if($_SERVER['REQUEST_METHOD']=='POST'){
+$error = '';
+
+// Handle POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $confirm = $_POST['confirm_password'];
+    $confirm  = $_POST['confirm_password'];
 
-    if($password !== $confirm){
+    if ($password !== $confirm) {
         $error = "Passwords do not match";
     } else {
+        // Check if username exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username=?");
-        $stmt->bind_param("s",$username);
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $res = $stmt->get_result();
-        if($res->num_rows){
+
+        if ($res->num_rows) {
             $error = "Username already exists";
         } else {
+            // Insert user
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("INSERT INTO users (username,password_hash) VALUES (?,?)");
-            $stmt->bind_param("ss",$username,$hash);
+            $stmt->bind_param("ss", $username, $hash);
             $stmt->execute();
+
             $_SESSION['user_id'] = $conn->insert_id;
             $_SESSION['username'] = $username;
+
+            // Redirect before any output
             header("Location: index.php");
             exit;
         }
@@ -80,7 +96,7 @@ a:hover {text-decoration:underline;}
     <input type="password" name="password" placeholder="Password" required>
     <input type="password" name="confirm_password" placeholder="Confirm Password" required>
     <button type="submit">Register</button>
-    <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
+    <?php if($error) echo "<p class='error'>$error</p>"; ?>
     <a href="login.php">Already have an account? Login</a>
 </form>
 </body>
