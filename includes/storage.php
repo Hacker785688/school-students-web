@@ -40,8 +40,5 @@ function nextId(array $data): int {
  * @param string $folder
  * @return string
  */
-function randomBackground(string $folder = 'assets/bg'): string {
-    $imgs = glob("$folder/*.{jpg,jpeg,png,gif}", GLOB_BRACE);
-    return $imgs ? $imgs[array_rand($imgs)] : '';
-}
+
 ?>
