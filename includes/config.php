@@ -1,29 +1,26 @@
 <?php
-// Database config
-$host = 'localhost';
-$user = 'portaluser';
-$pass = 'StrongPassword';
-$db   = 'student_portal';
+// JSON storage paths
+define('DATA_DIR', __DIR__ . '/../data');
 
-$conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_error) die("DB Connection failed: ".$conn->connect_error);
+// Ensure data directory exists
+if (!is_dir(DATA_DIR)) {
+    mkdir(DATA_DIR, 0755, true);
+}
 
-// Auto-create tables if not exist
-$conn->query("CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) UNIQUE,
-    password_hash VARCHAR(255)
-)");
+// Sections to store messages
+$sections = ['confessions', 'complaints', 'suggestions'];
 
-$sections = ['confessions','complaints','suggestions'];
+// Ensure each section file exists
+foreach ($sections as $section) {
+    $file = DATA_DIR . "/$section.json";
+    if (!file_exists($file)) {
+        file_put_contents($file, json_encode([]));
+    }
+}
 
-foreach ($sections as $sec) {
-    $conn->query("CREATE TABLE IF NOT EXISTS $sec (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100),
-        message TEXT NOT NULL,
-        user_id INT NOT NULL,
-        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
+// Ensure users file exists
+$users_file = DATA_DIR . "/users.json";
+if (!file_exists($users_file)) {
+    file_put_contents($users_file, json_encode([]));
 }
 ?>
