@@ -1,12 +1,14 @@
 <?php
 // Database config
-$host = 'localhost';
-$user = 'portaluser';
-$pass = 'StrongPassword';
-$db   = 'student_portal';
+$host = 'nozomi.proxy.rlwy.net';
+$user = 'root';
+$pass = 'XooMYlxpdqpTjKKhPUVqnqmoHXIjCrtU';
+$db   = 'railway';
+$port = 36241;
 
-$conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_error) die("DB Connection failed: ".$conn->connect_error);
+$conn = new mysqli($host, $user, $pass, $db, $port);
+if($conn->connect_error) die("DB Connection failed: ".$conn->connect_error);
+
 
 // Auto-create tables if not exist
 $conn->query("CREATE TABLE IF NOT EXISTS users (
