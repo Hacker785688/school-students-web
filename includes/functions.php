@@ -20,13 +20,14 @@ function insertMessage($section, $name, $message, $user_id) {
     writeJson($file, $data);
 }
 
-function deleteMessage($id, $section, $user_id) {
+function deleteMessage($id, $section, $user_id, $isAdmin=false) {
     $file = "data/$section.json";
     $data = readJson($file);
 
-    $data = array_filter($data, fn($m) =>
-        !($m['id'] == $id && $m['user_id'] == $user_id)
-    );
+    $data = array_filter($data, function($m) use ($id, $user_id, $isAdmin) {
+        if ($isAdmin) return $m['id'] != $id;
+        return !($m['id'] == $id && $m['user_id'] == $user_id);
+    });
 
     writeJson($file, array_values($data));
 }
