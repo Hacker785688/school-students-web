@@ -1,0 +1,19 @@
+<?php
+require "db.php";
+
+$type = $_POST['type'] ?? null;
+$location = $_POST['location'] ?? null;
+$description = $_POST['description'] ?? null;
+
+if (!$type || !$location || !$description) {
+    http_response_code(400);
+    exit("Invalid input");
+}
+
+$stmt = $conn->prepare(
+    "INSERT INTO issues (issue_type, location, description) VALUES (?, ?, ?)"
+);
+$stmt->bind_param("sss", $type, $location, $description);
+$stmt->execute();
+
+echo "OK";

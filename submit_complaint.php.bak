@@ -1,0 +1,25 @@
+<?php
+require "db.php";
+
+$name = $_POST['name'] ?? null;
+$department = $_POST['department'] ?? null;
+$message = $_POST['message'] ?? null;
+
+if (!$department || !$message) {
+    http_response_code(400);
+    exit("Invalid input");
+}
+
+$stmt = $conn->prepare(
+    "INSERT INTO complaints (name, department, message) VALUES (?, ?, ?)"
+);
+$stmt->bind_param("sss", $name, $department, $message);
+
+if (!$stmt->execute()) {
+    error_log("DB insert failed: " . $stmt->error);
+    http_response_code(500);
+    exit("Database error");
+}
+
+echo "OK";
+?>

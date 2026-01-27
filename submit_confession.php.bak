@@ -1,0 +1,17 @@
+<?php
+require "db.php";
+
+$message = $_POST['message'] ?? null;
+
+if (!$message) {
+    http_response_code(400);
+    exit("Invalid input");
+}
+
+$stmt = $conn->prepare(
+    "INSERT INTO confessions (message) VALUES (?)"
+);
+$stmt->bind_param("s", $message);
+$stmt->execute();
+
+echo "OK";

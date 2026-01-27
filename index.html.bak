@@ -1,0 +1,66 @@
+<?php
+include 'config.php';
+
+// Fetch messages
+$complaints = $conn->query("SELECT * FROM complaints ORDER BY id DESC");
+$issues = $conn->query("SELECT * FROM issues ORDER BY id DESC");
+$confessions = $conn->query("SELECT * FROM confessions ORDER BY id DESC");
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>🎓 Student Voice Portal</header>
+
+<section>
+<h2>Submit Your Feedback</h2>
+<form action="submit.php" method="POST">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <select name="type" required>
+        <option value="">Select Type</option>
+        <option value="complaint">Complaint</option>
+        <option value="issue">Issue</option>
+        <option value="confession">Confession</option>
+    </select>
+    <textarea name="message" placeholder="Your message..." rows="5" required></textarea>
+    <button type="submit">Submit</button>
+</form>
+</section>
+
+<section>
+<h2>Complaints</h2>
+<?php while($row = $complaints->fetch_assoc()): ?>
+    <div class="message-box">
+        <strong><?= htmlspecialchars($row['name']) ?>:</strong>
+        <p><?= htmlspecialchars($row['message']) ?></p>
+    </div>
+<?php endwhile; ?>
+</section>
+
+<section>
+<h2>Issues</h2>
+<?php while($row = $issues->fetch_assoc()): ?>
+    <div class="message-box">
+        <strong><?= htmlspecialchars($row['name']) ?>:</strong>
+        <p><?= htmlspecialchars($row['message']) ?></p>
+    </div>
+<?php endwhile; ?>
+</section>
+
+<section>
+<h2>Confessions</h2>
+<?php while($row = $confessions->fetch_assoc()): ?>
+    <div class="message-box">
+        <strong><?= htmlspecialchars($row['name']) ?>:</strong>
+        <p><?= htmlspecialchars($row['message']) ?></p>
+    </div>
+<?php endwhile; ?>
+</section>
+
+</body>
+</html>
