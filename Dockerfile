@@ -1,5 +1,8 @@
-# Use official PHP image with built-in server
+# Use official PHP image
 FROM php:8.2-cli
+
+# Install mysqli extension
+RUN docker-php-ext-install mysqli
 
 # Copy all project files into container
 COPY . /var/www/html
