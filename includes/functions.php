@@ -1,32 +1,43 @@
 <?php
 require_once 'config.php';
 
-// Fetch messages for section
+// Valid sections whitelist
+$valid_sections = ['confessions','complaints','suggestions'];
+
+// Fetch messages safely
 function fetchMessages($section) {
-    global $conn;
-    $res = $conn->query("SELECT * FROM $section ORDER BY submitted_at DESC");
+    global $conn, $valid_sections;
+    if(!in_array($section, $valid_sections)) return [];
+
+    $stmt = $conn->prepare("SELECT * FROM $section ORDER BY submitted_at DESC");
+    $stmt->execute();
+    $res = $stmt->get_result();
     return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
 }
 
-// Insert a new message
+// Insert a new message safely
 function insertMessage($section, $name, $message, $user_id) {
-    global $conn;
+    global $conn, $valid_sections;
+    if(!in_array($section, $valid_sections)) return false;
+
     $stmt = $conn->prepare("INSERT INTO $section (name,message,user_id) VALUES (?,?,?)");
-    $stmt->bind_param("ssi",$name,$message,$user_id);
-    $stmt->execute();
+    $stmt->bind_param("ssi", $name, $message, $user_id);
+    return $stmt->execute();
 }
 
-// Delete message: user only deletes own, admin can delete any
+// Delete message: user can delete own, admin can delete any
 function deleteMessage($id, $section, $user_id, $isAdmin=false) {
-    global $conn;
+    global $conn, $valid_sections;
+    if(!in_array($section, $valid_sections)) return false;
+
     if($isAdmin) {
         $stmt = $conn->prepare("DELETE FROM $section WHERE id=?");
-        $stmt->bind_param("i",$id);
+        $stmt->bind_param("i", $id);
     } else {
         $stmt = $conn->prepare("DELETE FROM $section WHERE id=? AND user_id=?");
-        $stmt->bind_param("ii",$id,$user_id);
+        $stmt->bind_param("ii", $id, $user_id);
     }
-    $stmt->execute();
+    return $stmt->execute();
 }
 
 // Pick random background from folder
